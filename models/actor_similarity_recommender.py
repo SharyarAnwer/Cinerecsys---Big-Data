@@ -32,23 +32,17 @@ actors_df = spark.read.parquet(ACTOR_FEATURES_PATH)
 # Structure:
 # [avg_rating (0), genre_index, genre_count, director_index, director_count]
 
-# movie_vector = DenseVector([
-#     0.0,   # avg_rating (unknown for new movie)
-#     2.0,   # genre_index (example)
-#     1.0,   # genre_count
-#     16.0,  # director_index (example)
-#     1.0    # director_count
-# ])
 movie_vector = DenseVector([
     0.0,   # avg_rating (unknown for new movie)
-    3.0,   # genre_index (example)
+    13.0,   # genre_index (example)
     1.0,   # genre_count
-    21.0,  # director_index (example)
+    43.0,  # director_index (example)
     1.0    # director_count
 ])
 
 # Broadcast movie vector
 movie_vector_bc = spark.sparkContext.broadcast(movie_vector)
+
 
 # ---------------------------------------------------------
 # Cosine Similarity Function
