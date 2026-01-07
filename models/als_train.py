@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 
@@ -48,17 +49,16 @@ def main():
     rmse = evaluator.evaluate(predictions)
 
     # ----------------------------
-    # Save ALS model
+    # Save RMSE as DataFrame to HDFS
     # ----------------------------
+    rmse_df = spark.createDataFrame([(f"RMSE on test set: {rmse:.4f}",)], ["rmse"])
     output_model_path = "hdfs://localhost:9000/cinerecsys/models/als_model"
-    als_model.write().overwrite().save(output_model_path)
+    rmse_df.write.mode("overwrite").text(f"{output_model_path}/als_rmse.txt")
 
     # ----------------------------
-    # Save RMSE as single text file in HDFS (Spark-native)
+    # Save ALS model
     # ----------------------------
-    rmse_str = f"RMSE on test set: {rmse:.4f}"
-    rmse_rdd = spark.sparkContext.parallelize([rmse_str])
-    rmse_rdd.coalesce(1).saveAsTextFile(f"{output_model_path}/als_rmse.txt")
+    als_model.write().overwrite().save(output_model_path)
 
     # ----------------------------
     # Print results (Windows-safe)
